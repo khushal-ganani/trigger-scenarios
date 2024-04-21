@@ -3,9 +3,9 @@
 trigger Q3_UpdateAccountDescription on Account (before update) {
     if (Trigger.isBefore && Trigger.isUpdate) {
         for (Account acc : Trigger.new) {
-            Account oldAccount = Trigger.oldMap.get(acc.Id);
-            if (acc.Phone != oldAccount.Phone) {
-                acc.Description += 'Phone is updated. Previous Phone Number was: '+oldAccount.Phone;
+            String oldPhone = (Account)(Trigger.oldMap.get(acc.Id)).Phone;
+            if (acc.Phone != oldPhone) {
+                acc.Description += 'Phone is updated. Previous Phone Number was: '+oldPhone;
             }
         }
     }

@@ -1,3 +1,4 @@
+
 trigger RollupOnGrandParent on OpportunityContactRole (after insert) {
 
     if (Trigger.isInsert && Trigger.isAfter) {

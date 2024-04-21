@@ -16,16 +16,16 @@ trigger Q14_UpdateChildContactOnAccUpdate on Account (after update) {
         // }
         // Database.SaveResult saveResult = Database.update(conList);
 
-        Map<Id,String> accWebMap = new Map<Id,String>();
+        Map<Id,String> accountWebsiteMap = new Map<Id,String>();
         for (Account acc : Trigger.new) {
             if (acc.Website != (Account)(Trigger.oldMap.get(acc.Id)).Website) {
-                accWebMap.put(acc.Id,acc.Website);
+                accountWebsiteMap.put(acc.Id, acc.Website);
             }
         }
-        if (!accWebMap.isEmpty()) {
-            for(Contact con : [SELECT Id, Company_Website__c FROM Contact WHERE AccountId IN :accWebMap.keySet()]) {
-                if (accWebMap.containsKey(con.AccountId)) {
-                    con.Company_Website__c = accWebMap.get(con.AccountId);
+        if (!accountWebsiteMap.isEmpty()) {
+            for(Contact con : [SELECT Id, Company_Website__c FROM Contact WHERE AccountId IN :accountWebsiteMap.keySet()]) {
+                if (accountWebsiteMap.containsKey(con.AccountId)) {
+                    con.Company_Website__c = accountWebsiteMap.get(con.AccountId);
                 }
             }
         }    

@@ -1,4 +1,4 @@
-//! If account phone is updated then pouplate the phone number on the related contact. (Using Map)
+//! If account phone is updated then populate the phone number on the related contact. (Using Map)
 trigger Q4_UpdateChildContacts on Account (after update) {
 
     //Getting a Map of all the Accounts whose phone is being updated
@@ -19,7 +19,7 @@ trigger Q4_UpdateChildContacts on Account (after update) {
         update conList;
     }
 
-    // other way of same trigger
+    //* other way of same trigger
     // Set<Id> accountIds = new Set<Id>();
     // for (Account acc : Trigger.new) {
     //     if (acc.Phone != Trigger.oldMap.get(acc.Id).Phone) {

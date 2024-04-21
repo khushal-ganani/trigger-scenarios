@@ -3,10 +3,8 @@ trigger Q13_UpdateParentAccountOnOppInsert on Opportunity (after insert) {
 
     Set<Id> oppIdSet = new Set<Id>();
     for (Opportunity opp : Trigger.new) {
-        if (opp.AccountId != null || opp.AccountId = '') {
-            if (opp.Amount > 20000) {
-                oppIdSet.add(opp.AccountId);
-            }
+        if ((opp.AccountId != null || opp.AccountId = '') && opp.Amount > 20000) {
+            oppIdSet.add(opp.AccountId);
         }
     }
 
