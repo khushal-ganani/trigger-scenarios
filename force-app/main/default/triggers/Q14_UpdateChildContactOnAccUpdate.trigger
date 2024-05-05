@@ -23,11 +23,13 @@ trigger Q14_UpdateChildContactOnAccUpdate on Account (after update) {
             }
         }
         if (!accountWebsiteMap.isEmpty()) {
-            for(Contact con : [SELECT Id, Company_Website__c FROM Contact WHERE AccountId IN :accountWebsiteMap.keySet()]) {
+            List<Contact> conList = [SELECT Id, Company_Website__c FROM Contact WHERE AccountId IN :accountWebsiteMap.keySet()];
+            for(Contact con : conList) {
                 if (accountWebsiteMap.containsKey(con.AccountId)) {
                     con.Company_Website__c = accountWebsiteMap.get(con.AccountId);
                 }
             }
+            update conList;
         }    
     }
 }

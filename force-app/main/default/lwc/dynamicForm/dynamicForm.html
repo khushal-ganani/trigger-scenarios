@@ -1,0 +1,32 @@
+
+<!-- This was asked in the Avatu's Interview -->
+<template>
+    <lightning-card icon-name="standard:account" variant="base">
+      <div slot="title">
+          Dynamic Form
+      </div>
+      
+      <div class="slds-var-m-around_medium">
+        <lightning-combobox
+          name="field"
+          label="Field"
+          value={value}
+          placeholder="Select Field"
+          options={options}
+          onchange={handleChange}
+        ></lightning-combobox>
+        <template lwc:if={emailField}>
+            <lightning-input 
+              type="email"
+              label="Email"
+            ></lightning-input>
+        </template>
+        <template lwc:if={phoneField}>
+            <lightning-input
+              type="phone"
+              label="Phone"
+            ></lightning-input>
+        </template>
+      </div>
+    </lightning-card>
+</template>

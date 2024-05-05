@@ -20,7 +20,7 @@ trigger Q15_RollupOnParentAccount on contact (after insert, after update, after 
                 if ((con.AccountId != null || con.AccountId != '') && 
                 (con.AccountId != (Contact)(Trigger.oldMap.get(con.Id)).AccountId)) {
                     accountIdSet.add(con.AccoutnId); //! adding the Id of the new reparented Account to calculate the number of contacts
-                    accountIdSet.add((Contact)(Trigger.oldMap.get(con.Id)).AccountId); //! also adding the Id of old Account to recalculate the number of contacts
+                    accountIdSet.add(((Contact)(Trigger.oldMap.get(con.Id))).AccountId); //! also adding the Id of old Account to recalculate the number of contacts
                 }
             }
         }
@@ -34,23 +34,44 @@ trigger Q15_RollupOnParentAccount on contact (after insert, after update, after 
         }
 
         if(accountIdSet != null && accountIdSet.size() > 0){
-            List<Account> accountList = [SELECT Id, Number_of_Contacts__c, Total_Contact_Amount__c, (SELECT Id FROM Contacts) 
-                                        FROM Account WHERE Id IN :accountIdSet];
-            if (accountList.size() > 0) {
-                for (Account acc : accountList) {
-                    acc.Number_of_Contacts__c = acc.Contact.size();
-                    
-                    if (!acc.Contacts.isEmpty()) {
-                        Decimal totalAmount = 0;
-                        for (Contact con : acc.Contacts) {
-                            totalAmount += con.Amount__c;
-                        }
 
-                        acc.Total_Contact_Amount__c = totalAmount;
+            //* First way to implement :-
+            // List<Account> accountList = [SELECT Id, Number_of_Contacts__c, Total_Contact_Amount__c, (SELECT Id FROM Contacts) 
+            //                             FROM Account WHERE Id IN :accountIdSet];
+            // if (accountList.size() > 0) {
+            //     for (Account acc : accountList) {
+            //         acc.Number_of_Contacts__c = acc.Contacts.size();
+                    
+            //         if (!acc.Contacts.isEmpty()) {
+            //             Decimal totalAmount = 0;
+            //             for (Contact con : acc.Contacts) {
+            //                 totalAmount += con.Amount__c;
+            //             }
+
+            //             acc.Total_Contact_Amount__c = totalAmount;
+            //         }
+            //     }
+            // }
+            // update accountList;
+
+            //* Another way to implement :-
+            List<AggregateResult> results = [SELECT AccountId, COUNT(Id)TotalContacts FROM Contacts WHERE AccountId IN :accountIdSet GROUP BY AccountId ORDER BY AccountId];
+            
+            if (!results.isEmpty()) {
+                Map<Id, Decimal> contactsCountMap = new Map<Id, Decimal>();
+                for (AggregateResult res : results) {
+                    contactsCountMap.put((Id)(res.get('AccountId')), (Decimal)(res.get('TotalContacts')));
+                }
+
+                List<Account> accountsToUpdate = [SELECT Id, Number_of_Contacts__c FROM Account WHERE Id IN :accountIdSet];
+                for (Account acc : accountsToUpdate) {
+                    if (contactsCountMap.containsKey(acc.Id)) {
+                        acc.Number_of_Contacts__c = contactsCountMap.get(acc.Id);
+                    }else{
+                        acc.Number_of_Contacts__c = 0;
                     }
                 }
             }
-            update accountList;
         }    
     }
 }
